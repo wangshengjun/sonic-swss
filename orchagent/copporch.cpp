@@ -626,6 +626,7 @@ void CoppOrch::doTask(Consumer &consumer)
                 it = consumer.m_toSync.erase(it);
                 break;
             case task_process_status::task_failed:
+                it = consumer.m_toSync.erase(it);
                 SWSS_LOG_ERROR("Processing copp task item failed, exiting. ");
                 return;
             case task_process_status::task_need_retry:
@@ -633,6 +634,7 @@ void CoppOrch::doTask(Consumer &consumer)
                 it++;
                 break;
             default:
+                it = consumer.m_toSync.erase(it);
                 SWSS_LOG_ERROR("Invalid task status:%d", task_status);
                 return;
         }
