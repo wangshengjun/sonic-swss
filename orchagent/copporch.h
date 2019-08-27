@@ -28,6 +28,9 @@ const string copp_policer_action_yellow_field = "yellow_action";
 typedef map<sai_object_id_t, sai_object_id_t> TrapGroupPolicerTable;
 /* TrapIdTrapGroupTable: trap ID, trap group ID */
 typedef map<sai_hostif_trap_type_t, sai_object_id_t> TrapIdTrapGroupTable;
+/* TrapIdTrapObjectTable: trap ID,  object id   */
+typedef map<sai_hostif_trap_type_t, sai_object_id_t> TrapIdTrapObjectTable;
+
 
 class CoppOrch : public Orch
 {
@@ -38,6 +41,7 @@ protected:
 
     TrapGroupPolicerTable m_trap_group_policer_map;
     TrapIdTrapGroupTable m_syncdTrapIds;
+    TrapIdTrapObjectTable m_trapIdObjectIds;
 
     void initDefaultHostIntfTable();
     void initDefaultTrapGroup();
@@ -51,7 +55,7 @@ protected:
 
     bool createPolicer(string trap_group, vector<sai_attribute_t> &policer_attribs);
     bool removePolicer(string trap_group_name);
-
+    bool removeTrapIds(const vector<sai_hostif_trap_type_t> &trap_id_list);
     sai_object_id_t getPolicer(string trap_group_name);
 
     virtual void doTask(Consumer& consumer);
