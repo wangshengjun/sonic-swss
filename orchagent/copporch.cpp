@@ -224,16 +224,17 @@ bool CoppOrch::removeTrapIds(const vector<sai_hostif_trap_type_t> &trap_id_list)
 
     for (auto trap_id : trap_id_list)
     {
-        trap_id_object = m_trapIdObjectIds[trap_id];
-        if (SAI_NULL_OBJECT_ID != trap_id_object)
+        if (m_trapIdObjectIds.find(trap_id) != m_trapIdObjectIds.end())
         {
+            trap_id_object = m_trapIdObjectIds[trap_id];
             sai_status_t status = sai_hostif_api->remove_hostif_trap(trap_id_object);
             if (status != SAI_STATUS_SUCCESS)
             {
                 SWSS_LOG_ERROR("Failed to remove trap %d, rv:%d", trap_id, status);
                 return false;
             }
-            m_trapIdObjectIds[trap_id] = SAI_NULL_OBJECT_ID;
+            m_trapIdObjectIds.erase(trap_id);
+            m_syncdTrapIds.erase(trap_id);
         }
     }
 
