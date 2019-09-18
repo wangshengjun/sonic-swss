@@ -212,7 +212,7 @@ bool CoppOrch::applyAttributesToTrapIds(sai_object_id_t trap_group_id,
             return false;
         }
         m_syncdTrapIds[trap_id] = trap_group_id;
-	m_trapIdObjectIds[trap_id] = hostif_trap_id;
+        m_trapIdObjectIds[trap_id] = hostif_trap_id;
     }
 
     return true;
@@ -575,7 +575,7 @@ task_process_status CoppOrch::processCoppRule(Consumer& consumer)
             }
         }
         
-        if ( !removeTrapIds(trap_ids_to_reset))
+        if (!removeTrapIds(trap_ids_to_reset))
         {
             SWSS_LOG_ERROR("Failed to remove trap id with group %s",trap_group_name.c_str());
             return task_process_status::task_failed;

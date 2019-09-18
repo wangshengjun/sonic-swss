@@ -4,14 +4,10 @@ import re
 import json
 
 class TestCopp(object):
-    def setup_db(self, dvs):
-        self.pdb = swsscommon.DBConnector(swsscommon.APPL_DB, dvs.redis_sock, 0)
-        self.adb = swsscommon.DBConnector(swsscommon.ASIC_DB, dvs.redis_sock, 0)
 
     def create_copp_group_table(self, dvs, testlog):
-        self.setup_db(dvs)
         group_name = "trap.group.test"
-        tbl = swsscommon.ProducerStateTable(self.pdb, "COPP_TABLE")
+        tbl = swsscommon.ProducerStateTable(dvs.pdb, "COPP_TABLE")
         fvs = swsscommon.FieldValuePairs([("trap_ids", "arp_resp"),
                                           ("trap_action", "copy"),
                                           ("trap_priority", "4"),
@@ -27,15 +23,13 @@ class TestCopp(object):
         time.sleep(1)
 
     def remove_copp_group_table(self, dvs, testlog):
-        self.setup_db(dvs)
         group_name = "trap.group.test"
-        tbl = swsscommon.ProducerStateTable(self.pdb, "COPP_TABLE")
+        tbl = swsscommon.ProducerStateTable(dvs.pdb, "COPP_TABLE")
         tbl._del(group_name)
         time.sleep(1)
 
     def verify_create_copp_group_table(self, dvs, testlog):
-        self.setup_db(dvs)
-        tbl_trap_group = swsscommon.Table(self.adb, "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_TRAP_GROUP")
+        tbl_trap_group = swsscommon.Table(dvs.adb, "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_TRAP_GROUP")
         keys = tbl_trap_group.getKeys()
 
         assert len(keys) == 2
@@ -51,7 +45,7 @@ class TestCopp(object):
                 else:
                     continue
         # Trap ids
-        tbl_trap_ids = swsscommon.Table(self.adb, "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_TRAP")
+        tbl_trap_ids = swsscommon.Table(dvs.adb, "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_TRAP")
         keys = tbl_trap_ids.getKeys()
         assert len(keys) == 2
         for k in keys:
@@ -73,8 +67,7 @@ class TestCopp(object):
                 continue
 
     def verify_remove_copp_group_table(self, dvs, testlog):
-        self.setup_db(dvs)
-        tbl_trap_group = swsscommon.Table(self.adb, "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_TRAP_GROUP")
+        tbl_trap_group = swsscommon.Table(dvs.adb, "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_TRAP_GROUP")
         keys = tbl_trap_group.getKeys()
         #only the defaut group
         assert len(keys) == 1 
@@ -84,16 +77,18 @@ class TestCopp(object):
                 assert field == 'NULL'
                 assert value == 'NULL'
         # Trap ids
-        tbl_trap_ids = swsscommon.Table(self.adb, "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_TRAP")
+        tbl_trap_ids = swsscommon.Table(dvs.adb, "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_TRAP")
         keys = tbl_trap_ids.getKeys()
         assert len(keys) == 1
 
 
-    def test_add_copp_grout_table(self, dvs, testlog):
+    def test_add_copp_group_table(self, dvs, testlog):
+        dvs.setup_db()
         self.create_copp_group_table(dvs, testlog)
         self.verify_create_copp_group_table(dvs, testlog)
 
-    def test_remove_copp_grout_table(self, dvs, testlog):
+    def test_remove_copp_group_table(self, dvs, testlog):
+        dvs.setup_db()
         self.create_copp_group_table(dvs, testlog)
         self.verify_create_copp_group_table(dvs, testlog)
         self.remove_copp_group_table(dvs, testlog)
