@@ -174,7 +174,8 @@ task_process_status BufferMgr::doSpeedUpdateTask(string port, string speed)
 
     fvVector.clear();
 
-    string buffer_pg_key = port + m_cfgBufferPgTable.getTableNameSeparator() + LOSSLESS_PGS;
+    string port_pattern = "*" + port + "*";
+    string buffer_pg_key = port_pattern + m_cfgBufferPgTable.getTableNameSeparator() + LOSSLESS_PGS;
 
     string profile_ref = string("[") +
                          CFG_BUFFER_PROFILE_TABLE_NAME +
