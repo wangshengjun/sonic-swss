@@ -166,17 +166,38 @@ void FdbOrch::update(sai_fdb_event_t        type,
         break;
 
     case SAI_FDB_EVENT_AGED:
-    case SAI_FDB_EVENT_MOVE:
         update.add = false;
         storeFdbEntryState(update);
 
-        SWSS_LOG_INFO("Notifying observers of FDB entry removal on AGED/MOVED");
+        SWSS_LOG_INFO("Notifying observers of FDB entry removal on AGED");
         for (auto observer: m_observers)
         {
             observer->update(SUBJECT_TYPE_FDB_CHANGE, &update);
         }
 
         break;
+
+    case SAI_FDB_EVENT_MOVE:
+	/* remove the old fdb entry */
+        update.add = false;
+        storeFdbEntryState(update);
+
+        SWSS_LOG_INFO("Notifying observers of FDB entry removal on MOVED");
+        for (auto observer: m_observers)
+        {
+            observer->update(SUBJECT_TYPE_FDB_CHANGE, &update);
+        }
+	/* add the new fdb entry */
+        update.add = true;
+        update.entry.port_name = update.port.m_alias;
+        storeFdbEntryState(update);
+
+        SWSS_LOG_INFO("Notifying observers of FDB entry LEARN");
+        for (auto observer: m_observers)
+        {
+            observer->update(SUBJECT_TYPE_FDB_CHANGE, &update);
+        }
+	break;
 
     case SAI_FDB_EVENT_FLUSHED:
 
